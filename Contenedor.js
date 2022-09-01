@@ -1,104 +1,124 @@
 import { constants, writeFile } from "node:fs";
 import { readFile, access } from "node:fs/promises";
+const fs = require("fs");
 
 export class Contenedor {
   constructor(path) {
     this.path = path;
   }
 
-  async verifiedArchive() {
-    try {
-      await access(this.path, constants.R_OK);
-    } catch {
-      writeFile(this.path, JSON.stringify([], null, 2), (err) => {
-        !err && console.log("archivo creado con exito");
-      });
-    }
-  }
+  async save(object) {
+    // ? Recibo objeto, lo guarda en archivo y da el ID que se asigna
 
-  async lastId() {
+    const dataToParse = await fs.readFileSync(this.file, "utf-8");
+    const dataParsed = JSON.parse(dataToParse);
+    // Ver si el producto ya existe
+    const productFound = dataParsed.find(({ title }) => title == object.title);
+
     try {
-      if (this.products.length === 0) {
-        return 1;
+      if (productFound) {
+        // * Si Producto existe, avisa por consola y no lo agrega
+        console.log("El producto ya existe en el archivo");
+      } else {
+        // * Si no existe, lo agrega y retorna el id asignado
+        object.id = dataParsed.length + 1;
+        dataParsed.push(object);
+        const updatedFile = JSON.stringify(dataParsed, null, " ");
+        fs.writeFileSync(this.file, updatedFile);
+        console.log(
+          `Se agregó el producto: ${object.title} y su id es ${object.id}`
+        );
+        return object.id;
       }
-      let newId = this.products[this.products.length - 1];
-      return newId.id + 1;
-    } catch (err) {
-      throw err.message;
+    } catch (error) {
+      console.log(`Error  detectado en save:${error}`);
     }
   }
 
-  async productExist(id) {
-    const exist = this.products.some((res) => res.id == parseInt(id));
-    return exist;
+  async getById(idEntered) {
+    // ? Recibo un ID y muestro si está, si no se imprime Null.
+
+    const dataToParse = await fs.readFileSync(this.file, "utf-8");
+    const dataParsed = JSON.parse(dataToParse);
+    // Compruebo si el producto ya existe en el archivo
+    const idFound = dataParsed.find(({ id }) => id === idEntered);
+
+    try {
+      if (idFound) {
+        console.table(idFound);
+        return idFound;
+      } else {
+        console.log("No se ha encontrado el producto");
+        return null;
+      }
+    } catch (error) {
+      console.error(`Error sobre la funcion getByID: ${error}`);
+    }
   }
 
   async getAll() {
-    try {
-      if ((await readFile(this.path, "utf-8")) !== []) {
-        return (this.products = JSON.parse(await readFile(this.path, "utf-8")));
-      }
-      return null;
-    } catch (err) {
-      throw err.message;
-    }
-  }
+    // ? Devuelve un array con todos los objetos que hay en el .JSON
 
-  async save(product) {
-    try {
-      await this.getAll();
-      const newId = await this.lastId(this.products);
-      product = { id: newId, ...product };
-      this.products = [...this.products, product];
-      writeFile(this.path, JSON.stringify(this.products, null, 2), (err) => {
-        !err && console.log(`producto añadido con id ${newId}`);
-      });
-    } catch (err) {
-      throw err.message;
-    }
-  }
+    const dataToParse = await fs.readFileSync(this.file, "utf-8");
+    const dataParsed = JSON.parse(dataToParse);
 
-  async getById(id) {
     try {
-      if (await this.productExist(id)) {
-        return this.products.find((res) => res.id == parseInt(id));
+      if (dataParsed.length > 0) {
+        console.log(dataParsed);
+        return dataParsed;
       } else {
-        return null;
+        console.log("No tienes elementos en lista");
       }
-    } catch (err) {
-      throw err.message;
+    } catch (error) {
+      console.error(`Error sobre la función getAll: ${error}`);
     }
   }
 
-  async deleteById(id) {
+  async deleteById(idEntered) {
+    // ? Elimina del archivo el objeto con el Id buscado
+
+    const dataToParse = await fs.readFileSync(this.file, "utf-8");
+    const dataParsed = JSON.parse(dataToParse);
+    // * Se filtran los productos que no cumplen las condiciones 
+    const leakedID = dataParsed.filter(({id}) =>  id !== idEntered);
+    // * Encuentra el producto con el id que se provee
+    const idFound = dataParsed.find(({ id }) => id === idEntered);
+
     try {
-      let i = 0;
-      for (const producto of this.products) {
-        if (producto.id == parseInt(id)) {
-          this.products.splice(i, 1);
-          writeFile(
-            this.path,
-            JSON.stringify(this.products, null, 2),
-            (err) => {
-              !err && console.log(`producto con id: ${id} eliminado!`);
-            }
-          );
-          return;
-        }
-        i = i + 1;
+      if (idFound) {
+        console.log(`Se eliminó el objeto que tenía el id:${idEntered} >> [[${idFound.title}]]`)
+        // * Se actualiza el .JSON
+        const updatedFile = JSON.stringify(leakedID, null, " ");
+        fs.writeFileSync(this.file, updatedFile);
+        
+      } else {
+        console.log(`No se encontró el objeto con id: ${idEntered}`);
       }
-    } catch (err) {
-      throw err.message;
+    } catch (error) {
+      console.log(`Error en función en deleteById: ${error}`)
     }
   }
 
   async deleteAll() {
-    try {
-      writeFile(this.path, JSON.stringify([], null, 2), (err) => {
-        !err && console.log(`el archivo fue limpiado con exito!`);
-      });
-    } catch (err) {
-      throw err.message;
-    }
+    console.log("Se han eliminado todos los objetos")
+    // * Borrado de todos los objetos (Se sobreescribe el archivo a un array vacío)
+    await fs.writeFileSync(this.file, "[]")
   }
 }
+
+const file = "./misproductos.json";
+const contenedor = new Contenedor(file);
+
+let nuevoObjeto = {
+  title: "peugeot",
+  price: 6000,
+  thumbnail:
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Peugeot_RCZ_%28Facelift%29_%E2%80%93_Frontansicht%2C_7._Dezember_2014%2C_Ratingen.jpg/1920px-Peugeot_RCZ_%28Facelift%29_%E2%80%93_Frontansicht%2C_7._Dezember_2014%2C_Ratingen.jpg",
+};
+
+//primero desbloquee una funcion y luego en consola ejecute node index.js
+  contenedor.save(nuevoObjeto); 
+// contenedor.getById(2) 
+//  contenedor.getAll(); 
+// contenedor.deleteById(3)
+// contenedor.deleteAll()
