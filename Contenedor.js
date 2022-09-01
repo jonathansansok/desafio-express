@@ -1,9 +1,9 @@
-import { constants, writeFile } from "node:fs";
-import { readFile, access } from "node:fs/promises";
+/* import { constants, writeFile } from "node:fs";
+import { readFile, access } from "node:fs/promises"; */
 const fs = require("fs");
 
 export class Contenedor {
-  constructor(path) {
+  constructor(file) {
     this.path = path;
   }
 

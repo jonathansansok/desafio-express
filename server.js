@@ -1,5 +1,5 @@
 import express from "express";
-import { Contenedor } from "./Contenedor.js";
+import  "./Contenedor.js";
 
 const app = express();
 
