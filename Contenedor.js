@@ -109,15 +109,16 @@ const file = "./misproductos.json";
 const contenedor = new Contenedor(file);
 
 let nuevoObjeto = {
-  title: "peugeot",
-  price: 6000,
+  title: "hola",
+  price: 111111111111,
   thumbnail:
     "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Peugeot_RCZ_%28Facelift%29_%E2%80%93_Frontansicht%2C_7._Dezember_2014%2C_Ratingen.jpg/1920px-Peugeot_RCZ_%28Facelift%29_%E2%80%93_Frontansicht%2C_7._Dezember_2014%2C_Ratingen.jpg",
 };
 
 //primero desbloquee una funcion y luego en consola ejecute node index.js
 contenedor.save(nuevoObjeto);
-// contenedor.getById(2)
+ contenedor.getById(2)
 //  contenedor.getAll();
 // contenedor.deleteById(3)
 // contenedor.deleteAll()
+module.exports = Contenedor
