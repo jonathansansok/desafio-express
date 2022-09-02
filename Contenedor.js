@@ -1,14 +1,14 @@
- import { constants, writeFile } from "node:fs";
-import { readFile, access } from "node:fs/promises"; 
-/* const fs = require("fs"); */
+/*  import { constants, writeFile } from "node:fs";
+import { readFile, access } from "node:fs/promises";  */
+ const fs = require("fs"); 
 
-export class Contenedor {
+class Contenedor {
   constructor(file) {
     this.path = path;
   }
 
   async save(object) {
-    // ? Recibo objeto, lo guarda en archivo y da el ID que se asigna
+    // Recibo objeto, lo guarda en archivo y da el ID que se asigna
 
     const dataToParse = await fs.readFileSync(this.file, "utf-8");
     const dataParsed = JSON.parse(dataToParse);
