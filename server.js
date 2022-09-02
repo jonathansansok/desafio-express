@@ -4,7 +4,9 @@
 const express = require('express')
 const app = express();
 const Contenedor = require('./Contenedor.js');
+
 const server = app.listen(8080, () => console.log("server up!!"));
+
 server.on("error", (error) => console.log(`Error con el servidor`));
 
 let numeroAleatorio = 0;
