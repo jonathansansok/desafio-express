@@ -1,6 +1,4 @@
-/*  import { constants, writeFile } from "node:fs";
-import { readFile, access } from "node:fs/promises";  */
- const fs = require("fs"); 
+const fs = require("fs");
 
 class Contenedor {
   constructor(file) {
@@ -79,30 +77,31 @@ class Contenedor {
 
     const dataToParse = await fs.readFileSync(this.file, "utf-8");
     const dataParsed = JSON.parse(dataToParse);
-    // * Se filtran los productos que no cumplen las condiciones 
-    const leakedID = dataParsed.filter(({id}) =>  id !== idEntered);
+    // * Se filtran los productos que no cumplen las condiciones
+    const leakedID = dataParsed.filter(({ id }) => id !== idEntered);
     // * Encuentra el producto con el id que se provee
     const idFound = dataParsed.find(({ id }) => id === idEntered);
 
     try {
       if (idFound) {
-        console.log(`Se eliminó el objeto que tenía el id:${idEntered} >> [[${idFound.title}]]`)
+        console.log(
+          `Se eliminó el objeto que tenía el id:${idEntered} >> [[${idFound.title}]]`
+        );
         // * Se actualiza el .JSON
         const updatedFile = JSON.stringify(leakedID, null, " ");
         fs.writeFileSync(this.file, updatedFile);
-        
       } else {
         console.log(`No se encontró el objeto con id: ${idEntered}`);
       }
     } catch (error) {
-      console.log(`Error en función en deleteById: ${error}`)
+      console.log(`Error en función en deleteById: ${error}`);
     }
   }
 
   async deleteAll() {
-    console.log("Se han eliminado todos los objetos")
+    console.log("Se han eliminado todos los objetos");
     // * Borrado de todos los objetos (Se sobreescribe el archivo a un array vacío)
-    await fs.writeFileSync(this.file, "[]")
+    await fs.writeFileSync(this.file, "[]");
   }
 }
 
@@ -117,8 +116,8 @@ let nuevoObjeto = {
 };
 
 //primero desbloquee una funcion y luego en consola ejecute node index.js
-  contenedor.save(nuevoObjeto); 
-// contenedor.getById(2) 
-//  contenedor.getAll(); 
+contenedor.save(nuevoObjeto);
+// contenedor.getById(2)
+//  contenedor.getAll();
 // contenedor.deleteById(3)
 // contenedor.deleteAll()
