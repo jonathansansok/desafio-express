@@ -4,7 +4,7 @@ import { readFile, access } from "node:fs/promises";  */
 
 class Contenedor {
   constructor(file) {
-    this.path = path;
+    this.file = file;
   }
 
   async save(object) {
